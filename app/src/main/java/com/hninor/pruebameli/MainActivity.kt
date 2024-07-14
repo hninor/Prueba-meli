@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
@@ -16,11 +17,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.hninor.pruebameli.ui.screens.SearchScreen
 import com.hninor.pruebameli.ui.theme.PruebaMeliTheme
+import com.hninor.pruebameli.utils.CustomizedExceptionHandler
 import com.hninor.pruebameli.viewmodel.MeliViewModel
 import com.hninor.vassprueba.screens.ResultDetails
-import com.hninor.pruebameli.ui.screens.SearchScreen
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -33,7 +36,15 @@ class MainActivity : ComponentActivity() {
             PruebaMeliTheme {
                 // A surface container using the 'background' color from the theme
                 Scaffold(
-                    topBar = { TopAppBar({ Text(stringResource(R.string.app_name)) }) },
+                    topBar = {
+                        TopAppBar({
+                            Text(stringResource(R.string.app_name))
+/*                            Button(onClick = { throw NullPointerException("Prueba Henry") }) {
+                                
+                            }*/
+
+                        })
+                    },
                     snackbarHost = { SnackbarHost(viewModel.snackbarHostState) },
                 ) { paddingValues ->
                     Box(Modifier.padding(paddingValues)) {
@@ -42,6 +53,21 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        Thread.setDefaultUncaughtExceptionHandler(
+            CustomizedExceptionHandler(
+                this,
+                getpathCrashReport()
+            )
+        )
+    }
+
+    private fun getpathCrashReport(): String {
+        val name = File(applicationContext.getExternalFilesDir(null).toString() + "/Crashes")
+        if (!name.exists()) {
+            name.mkdirs()
+        }
+        return name.toString()
     }
 }
 
