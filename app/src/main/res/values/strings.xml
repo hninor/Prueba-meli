@@ -3,4 +3,6 @@
     <string name="sin_resultados">Sin resultados</string>
     <string name="intenta_otra_busqueda">Intente otra búsqueda</string>
     <string name="buscar_productos">Buscar productos</string>
+    <string name="back_button">Back</string>
+    <string name="detalle">Detalle</string>
 </resources>

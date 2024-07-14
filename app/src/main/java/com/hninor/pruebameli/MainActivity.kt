@@ -4,23 +4,24 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.hninor.pruebameli.ui.screens.SearchScreen
 import com.hninor.pruebameli.ui.theme.PruebaMeliTheme
 import com.hninor.pruebameli.utils.CustomizedExceptionHandler
 import com.hninor.pruebameli.viewmodel.MeliViewModel
+import com.hninor.vassprueba.screens.MeliAppBar
 import com.hninor.vassprueba.screens.ResultDetails
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
@@ -34,23 +35,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             PruebaMeliTheme {
-                // A surface container using the 'background' color from the theme
-                Scaffold(
-                    topBar = {
-                        TopAppBar({
-                            Text(stringResource(R.string.app_name))
-/*                            Button(onClick = { throw NullPointerException("Prueba Henry") }) {
-                                
-                            }*/
-
-                        })
-                    },
-                    snackbarHost = { SnackbarHost(viewModel.snackbarHostState) },
-                ) { paddingValues ->
-                    Box(Modifier.padding(paddingValues)) {
-                        MainNavHost(viewModel)
-                    }
-                }
+                PruebaMeliApp(viewModel = viewModel)
             }
         }
 
@@ -73,22 +58,54 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-private fun MainNavHost(viewModel: MeliViewModel) {
-    val navController = rememberNavController()
-    NavHost(navController, startDestination = NavigationDestinations.SEARCH_RESULTS_LIST) {
-        composable(route = NavigationDestinations.SEARCH_RESULTS_LIST) {
-            SearchScreen(
-                viewModel = viewModel,
-                onResultClick = { result ->
-                    viewModel.searchResultSelected = result
-                    navController.navigate(NavigationDestinations.SEARCH_RESULT_DETAILS)
-                }
+fun PruebaMeliApp(
+    viewModel: MeliViewModel,
+    navController: NavHostController = rememberNavController()
+) {
+
+
+    val backStackEntry by navController.currentBackStackEntryAsState()
+
+    val currentScreen = MeliScreen.valueOf(
+        backStackEntry?.destination?.route ?: MeliScreen.Busqueda.name
+    )
+    Scaffold(
+        topBar = {
+            MeliAppBar(
+                currentScreen = currentScreen,
+                canNavigateBack = navController.previousBackStackEntry != null,
+                navigateUp = { navController.navigateUp() },
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(viewModel.snackbarHostState) },
+    ) { paddingValues ->
+        Box(Modifier.padding(paddingValues)) {
+            NavHost(
+                navController = navController,
+                startDestination = MeliScreen.Busqueda.name
+            ) {
+                composable(route = MeliScreen.Busqueda.name) {
+                    SearchScreen(
+                        viewModel = viewModel,
+                        onResultClick = { result ->
+                            viewModel.searchResultSelected = result
+                            navController.navigate(MeliScreen.Detalle.name)
+                        }
+                    )
+                }
 
-        composable(route = NavigationDestinations.SEARCH_RESULT_DETAILS) { navBackStackEntry ->
-            ResultDetails(viewModel.searchResultSelected)
-        }
+                composable(route = MeliScreen.Detalle.name) { navBackStackEntry ->
+                    ResultDetails(viewModel.searchResultSelected)
+                }
 
+            }
+        }
     }
 }
+
+enum class MeliScreen(@StringRes val title: Int) {
+    Busqueda(title = R.string.app_name),
+    Detalle(title = R.string.detalle),
+
+}
+

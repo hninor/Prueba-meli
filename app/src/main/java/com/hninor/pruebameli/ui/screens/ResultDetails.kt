@@ -10,17 +10,27 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.hninor.pruebameli.MeliScreen
 import com.hninor.pruebameli.R
 import com.hninor.pruebameli.api.entry.Results
 import com.hninor.pruebameli.api.entry.formatPrice
@@ -104,12 +114,40 @@ private fun LaunchDetailsPreview() {
     ResultDetails(result = Results())
 }
 
-private sealed interface LaunchDetailsState {
-    object Loading : LaunchDetailsState
-    //data class ProtocolError(val exception: ApolloException) : LaunchDetailsState
-    //data class Success(val data: LaunchDetailsQuery.Data) : LaunchDetailsState
 
-    data class ApplicationError(val errors: List<Error>) : LaunchDetailsState
+@Composable
+fun MeliAppBar(
+    currentScreen: MeliScreen,
+    canNavigateBack: Boolean,
+    navigateUp: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TopAppBar(
+        title = { Text(stringResource(currentScreen.title)) },
+        colors = TopAppBarDefaults.mediumTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+        ),
+        modifier = modifier,
+        navigationIcon = {
+            if (canNavigateBack) {
+                IconButton(onClick = navigateUp) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back_button)
+                    )
+                }
+            }
+        },
+        actions = {
+
+            IconButton(onClick = { throw NullPointerException("Prueba Henry")  }) {
+                Icon(
+                    imageVector = Icons.Filled.Delete,
+                    contentDescription = "Localized description"
+                )
+            }
+        }
+    )
 }
 
 
