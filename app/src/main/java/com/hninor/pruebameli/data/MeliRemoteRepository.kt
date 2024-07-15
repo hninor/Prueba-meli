@@ -22,8 +22,12 @@ class MeliRemoteRepository @Inject constructor() {
             } else {
                 ApiResponseStatus.Error("Http code: $response.code()")
             }
-        } catch (e: UnknownHostException) {
-            ApiResponseStatus.Error("Revise su conexión a internet")
+        } catch (e: Exception) {
+            if (e is UnknownHostException) {
+                ApiResponseStatus.Error("Revise su conexión a internet")
+            } else {
+                ApiResponseStatus.Error(e.message ?: "")
+            }
         }
 
     }
