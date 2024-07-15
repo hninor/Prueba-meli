@@ -138,7 +138,7 @@ fun MeliAppBar(
                 }
             }
         },
-        actions = {
+/*        actions = {
 
             IconButton(onClick = { throw NullPointerException("Prueba Henry")  }) {
                 Icon(
@@ -146,7 +146,7 @@ fun MeliAppBar(
                     contentDescription = "Localized description"
                 )
             }
-        }
+        }*/
     )
 }
 
